@@ -41,7 +41,7 @@ with DAG(
 
     cloud_analytics = DataProcPySparkOperator(
         task_id="analyze-data",
-        main="gs://europe-west1-training-airfl-b3ce8eaa-bucket/spark_statistics.py",
+        main="gs://europe-west1-training-airfl-b3ce8eaa-bucket/other/spark_statistics.py",
         cluster_name=cluster_name,
         arguments=["{{ ds }}"]
     )
