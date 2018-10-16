@@ -59,7 +59,8 @@ with DAG(
         bucket="airflow-training-simple-dag",
         source_objects="average_prices/transfer_date={{ds}}",
         destination_project_dataset_table="property_price_averages",
-        source_format="parquet"
+        source_format="parquet",
+        write_disposition="WRITE_TRUNCATE"
     )
 
     psql_to_gcs >> create_cluster >> cloud_analytics >> delete_cluster
