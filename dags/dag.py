@@ -15,7 +15,7 @@ with DAG(
     default_args={
         "owner": "airflow",
         "start_date": dt.datetime(2018, 10, 10),
-        "depends_on_past": True,
+        "depends_on_past": False,
         "email_on_failure": True,
         "email": "airflow_errors@myorganisation.com",
     },
