@@ -57,8 +57,8 @@ with DAG(
     store_analytics = GoogleCloudStorageToBigQueryOperator(
         task_id="store_statistics",
         bucket="airflow-training-simple-dag",
-        source_objects="average_prices/transfer_date={{ds}}",
-        destination_project_dataset_table="property_price_averages",
+        source_objects=["average_prices/transfer_date={{ds}}/*.parquet"],
+        destination_project_dataset_table=gcs_project_id + ".property_price_averages.average_{{ ds_nodash }}",
         source_format="parquet",
         write_disposition="WRITE_TRUNCATE"
     )
