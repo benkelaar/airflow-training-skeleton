@@ -41,7 +41,7 @@ with DAG(
 
     cloud_analytics = DataProcPySparkOperator(
         task_id="analyze-data",
-        main="gs://gdd-training/build_statistics.py",
+        main="gs://gdd-trainings-bucket/build_statistics_simple.py",
         cluster_name=cluster_name,
         arguments=["{{ ds }}"]
     )
