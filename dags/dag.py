@@ -2,6 +2,7 @@ import datetime as dt
 
 from airflow import DAG
 from airflow.utils.trigger_rule import TriggerRule
+from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterCreateOperator,
     DataprocClusterDeleteOperator,
@@ -40,7 +41,7 @@ with DAG(
     )
 
     cloud_analytics = DataProcPySparkOperator(
-        task_id="analyze-data",
+        task_id="analyze_data",
         main="gs://europe-west1-training-airfl-b3ce8eaa-bucket/other/spark_statistics.py",
         cluster_name=cluster_name,
         arguments=["{{ ds }}"]
@@ -53,4 +54,13 @@ with DAG(
         trigger_rule=TriggerRule.ALL_DONE
     )
 
+    store_analytics = GoogleCloudStorageToBigQueryOperator(
+        task_id="store_statistics",
+        bucket="airflow-training-simple-dag",
+        source_objects="average_prices/transfer_date={{ds}}",
+        destination_project_dataset_table="property_price_averages",
+        source_format="parquet"
+    )
+
     psql_to_gcs >> create_cluster >> cloud_analytics >> delete_cluster
+    cloud_analytics >> store_analytics
