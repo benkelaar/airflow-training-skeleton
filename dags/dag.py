@@ -36,14 +36,14 @@ with DAG(
         cluster_name=cluster_name,
         project_id=gcs_project_id,
         num_workers=2,
-        zone="EU"
+        zone="europe-west4-a"
     )
 
     cloud_analytics = DataProcPySparkOperator(
         task_id="analyze-data",
         main="gs://gdd-training/build_statistics.py",
         cluster_name=cluster_name,
-        arguments={}
+        arguments=["{{ ds }}"]
     )
 
     delete_cluster = DataprocClusterDeleteOperator(
