@@ -4,11 +4,11 @@ from airflow import DAG
 from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 
 dag = DAG(
-    dag_id="my_first_dag",
+    dag_id="training-money-maker",
     schedule_interval="30 7 * * *",
     default_args={
         "owner": "airflow",
-        "start_date": dt.datetime(2018, 8, 1),
+        "start_date": dt.datetime(2018, 10, 10),
         "depends_on_past": True,
         "email_on_failure": True,
         "email": "airflow_errors@myorganisation.com",
