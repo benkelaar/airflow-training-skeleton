@@ -1,4 +1,5 @@
 import airflow.models as af_models
+import glob
 
 for module in glob.glob("dags/*.py"):
     assert any(
