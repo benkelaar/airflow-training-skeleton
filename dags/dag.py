@@ -11,6 +11,16 @@ from airflow.contrib.operators.dataproc_operator import (
 from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 from currency_conversion_operator import HttpToGcsOperator
 
+
+def create_conversion_task(task_id, target_currency):
+    return HttpToGcsOperator(
+        task_id=task_id,
+        http_conn_id='currency_converter',
+        endpoint="airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=" + target_currency,
+        gcs_path="currency_rates/" + target_currency + "/{{ ds }}"
+    )
+
+
 with DAG(
     dag_id="training-money-maker",
     schedule_interval="30 7 * * *",
@@ -22,11 +32,14 @@ with DAG(
         "email": "airflow_errors@myorganisation.com",
     },
 ) as dag:
-    currency_retrieval = HttpToGcsOperator(
-        task_id="currency_retrieval",
-        http_conn_id='currency_converter',
-        endpoint="airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=USD",
-        gcs_path="currency_rates/{{ ds }}"
+    usd_conversion_rate = create_conversion_task(
+        task_id="usd_conversion_rate",
+        target_currency="USD"
+    )
+
+    eur_conversion_rate = create_conversion_task(
+        task_id="eur_conversion_rate",
+        target_currency="EUR"
     )
 
     psql_to_gcs = PostgresToGoogleCloudStorageOperator(
