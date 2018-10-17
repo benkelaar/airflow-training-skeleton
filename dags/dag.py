@@ -85,5 +85,6 @@ with DAG(
     )
 
     psql_to_gcs >> create_cluster >> cloud_analytics >> delete_cluster
-    currency_retrieval >> create_cluster
+    usd_conversion_rate >> create_cluster
+    eur_conversion_rate >> create_cluster
     cloud_analytics >> store_analytics
