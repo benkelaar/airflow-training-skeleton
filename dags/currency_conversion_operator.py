@@ -41,10 +41,11 @@ class HttpToGcsOperator(BaseOperator):
         try:
             with os.fdopen(file, 'w') as tmp:
                 tmp.write(result.text)
-                GoogleCloudStorageHook().upload(
-                    bucket='airflow-training-simple-dag',
-                    object=self.gcs_path,
-                    mime_type='application/json',
-                    filename=path)
+
+            GoogleCloudStorageHook().upload(
+                bucket='airflow-training-simple-dag',
+                object=self.gcs_path,
+                mime_type='application/json',
+                filename=path)
         finally:
             os.remove(path)
