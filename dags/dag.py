@@ -23,6 +23,7 @@ with DAG(
     },
 ) as dag:
     currency_retrieval = HttpToGcsOperator(
+        task_id="currency_retrieval",
         http_conn_id='currency_converter',
         endpoint="airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=USD",
         gcs_path="currency_rates/{{ ds }}"
