@@ -3,6 +3,9 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
 
+import os
+import tempfile
+
 
 class HttpToGcsOperator(BaseOperator):
     """
@@ -34,8 +37,16 @@ class HttpToGcsOperator(BaseOperator):
     def execute(self, context):
         result = HttpHook(http_conn_id=self.http_conn_id, method='GET').run(endpoint=self.endpoint)
 
-        GoogleCloudStorageHook().upload(
-            bucket='airflow-training-simple-dag',
-            object=result.text,
-            mime_type='application/json',
-            filename=self.gcs_path)
+        file, path = tempfile.mkstemp()
+        try:
+            with os.fdopen(file, 'w') as tmp:
+                tmp.write(result.text)
+                GoogleCloudStorageHook().upload(
+                    bucket='airflow-training-simple-dag',
+                    object=self.gcs_path,
+                    mime_type='application/json',
+                    filename=path)
+        finally:
+            os.remove(path)
+
+
