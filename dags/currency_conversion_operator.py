@@ -35,7 +35,7 @@ class HttpToGcsOperator(BaseOperator):
         result = HttpHook(http_conn_id=self.http_conn_id, method='GET').run(endpoint=self.endpoint)
 
         GoogleCloudStorageHook().upload(
-            bucket=self.bucket,
+            bucket='airflow-training-simple-dag',
             object=result.text,
             mime_type='application/json',
             filename=self.gcs_path)
