@@ -9,6 +9,7 @@ from airflow.contrib.operators.dataproc_operator import (
     DataProcPySparkOperator
 )
 from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
+from currency_conversion_operator import HttpToGcsOperator
 
 with DAG(
     dag_id="training-money-maker",
@@ -21,6 +22,12 @@ with DAG(
         "email": "airflow_errors@myorganisation.com",
     },
 ) as dag:
+    currency_retrieval = HttpToGcsOperator(
+        http_conn_id='currency_converter',
+        endpoint="airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=USD",
+        gcs_path="currency_rates/{{ ds }}"
+    )
+
     psql_to_gcs = PostgresToGoogleCloudStorageOperator(
         task_id="read_postgres",
         postgres_conn_id="postgres_training",
@@ -57,11 +64,12 @@ with DAG(
     store_analytics = GoogleCloudStorageToBigQueryOperator(
         task_id="store_statistics",
         bucket="airflow-training-simple-dag",
-        source_objects=["average_prices/transfer_date={{ds}}/*.parquet"],
+        source_objects=["average_prices/transfer_date={{ ds }}/*.parquet"],
         destination_project_dataset_table=gcs_project_id + ".property_price_averages.average_{{ ds_nodash }}",
         source_format="parquet",
         write_disposition="WRITE_TRUNCATE"
     )
 
     psql_to_gcs >> create_cluster >> cloud_analytics >> delete_cluster
+    currency_retrieval >> create_cluster
     cloud_analytics >> store_analytics
