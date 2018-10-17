@@ -48,5 +48,3 @@ class HttpToGcsOperator(BaseOperator):
                     filename=path)
         finally:
             os.remove(path)
-
-
